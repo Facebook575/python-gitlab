@@ -1,190 +1,718 @@
-python-gitlab
-=============
-
-.. image:: https://github.com/python-gitlab/python-gitlab/workflows/Test/badge.svg
-   :target: https://github.com/python-gitlab/python-gitlab/actions
-
-.. image:: https://badge.fury.io/py/python-gitlab.svg
-   :target: https://badge.fury.io/py/python-gitlab
-
-.. image:: https://readthedocs.org/projects/python-gitlab/badge/?version=latest
-   :target: https://python-gitlab.readthedocs.org/en/latest/?badge=latest
-
-.. image:: https://codecov.io/github/python-gitlab/python-gitlab/coverage.svg?branch=main
-    :target: https://codecov.io/github/python-gitlab/python-gitlab?branch=main
-
-.. image:: https://img.shields.io/pypi/pyversions/python-gitlab.svg
-   :target: https://pypi.python.org/pypi/python-gitlab
-
-.. image:: https://img.shields.io/gitter/room/python-gitlab/Lobby.svg
-   :target: https://gitter.im/python-gitlab/Lobby
-
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/python/black
-
-.. image:: https://img.shields.io/github/license/python-gitlab/python-gitlab
-   :target: https://github.com/python-gitlab/python-gitlab/blob/main/COPYING
-
-``python-gitlab`` is a Python package providing access to the GitLab APIs.
-
-It includes a client for GitLab's v4 REST API, synchronous and asynchronous GraphQL API
-clients, as well as a CLI tool (``gitlab``) wrapping REST API endpoints.
-
-.. _features:
-
-Features
---------
-
-``python-gitlab`` enables you to:
-
-* write Pythonic code to manage your GitLab resources.
-* pass arbitrary parameters to the GitLab API. Simply follow GitLab's docs
-  on what parameters are available.
-* use a synchronous or asynchronous client when using the GraphQL API.
-* access arbitrary endpoints as soon as they are available on GitLab, by using
-  lower-level API methods.
-* use persistent requests sessions for authentication, proxy and certificate handling.
-* handle smart retries on network and server errors, with rate-limit handling.
-* flexible handling of paginated responses, including lazy iterators.
-* automatically URL-encode paths and parameters where needed.
-* automatically convert some complex data structures to API attribute types
-* merge configuration from config files, environment variables and arguments.
-
-Installation
-------------
-
-As of 5.0.0, ``python-gitlab`` is compatible with Python 3.9+.
-
-Use ``pip`` to install the latest stable version of ``python-gitlab``:
-
-.. code-block:: console
-
-   $ pip install --upgrade python-gitlab
-
-The current development version is available on both `GitHub.com
-<https://github.com/python-gitlab/python-gitlab>`__ and `GitLab.com
-<https://gitlab.com/python-gitlab/python-gitlab>`__, and can be
-installed directly from the git repository:
-
-.. code-block:: console
-
-   $ pip install git+https://github.com/python-gitlab/python-gitlab.git
-
-From GitLab:
-
-.. code-block:: console
-
-   $ pip install git+https://gitlab.com/python-gitlab/python-gitlab.git
-
-Using the docker images
------------------------
-
-``python-gitlab`` provides Docker images in two flavors, based on the Alpine and Debian slim
-python `base images <https://hub.docker.com/_/python>`__. The default tag is ``alpine``,
-but you can explicitly use the alias (see below).
-
-The alpine image is smaller, but you may want to use the Debian-based slim tag (currently 
-based on ``-slim-bullseye``) if you are running into issues or need a more complete environment
-with a bash shell, such as in CI jobs.
-
-The images are published on the GitLab registry, for example:
-
-* ``registry.gitlab.com/python-gitlab/python-gitlab:latest`` (latest, alpine alias)
-* ``registry.gitlab.com/python-gitlab/python-gitlab:alpine`` (latest alpine)
-* ``registry.gitlab.com/python-gitlab/python-gitlab:slim-bullseye`` (latest slim-bullseye)
-* ``registry.gitlab.com/python-gitlab/python-gitlab:v3.2.0`` (alpine alias)
-* ``registry.gitlab.com/python-gitlab/python-gitlab:v3.2.0-alpine``
-* ``registry.gitlab.com/python-gitlab/python-gitlab:v3.2.0-slim-bullseye``
-
-You can run the Docker image directly from the GitLab registry:
-
-.. code-block:: console
-
-   $ docker run -it --rm registry.gitlab.com/python-gitlab/python-gitlab:latest <command> ...
-
-For example, to get a project on GitLab.com (without authentication):
-
-.. code-block:: console
-
-   $ docker run -it --rm registry.gitlab.com/python-gitlab/python-gitlab:latest project get --id gitlab-org/gitlab
-
-You can also mount your own config file:
-
-.. code-block:: console
-
-   $ docker run -it --rm -v /path/to/python-gitlab.cfg:/etc/python-gitlab.cfg registry.gitlab.com/python-gitlab/python-gitlab:latest <command> ...
-
-Usage inside GitLab CI
-~~~~~~~~~~~~~~~~~~~~~~
-
-If you want to use the Docker image directly inside your GitLab CI as an ``image``, you will need to override
-the ``entrypoint``, `as noted in the official GitLab documentation <https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#override-the-entrypoint-of-an-image>`__:
-
-.. code-block:: yaml
-
-   Job Name:
-      image:
-         name: registry.gitlab.com/python-gitlab/python-gitlab:latest
-         entrypoint: [""]
-      before_script:
-         gitlab --version
-      script:
-         gitlab <command>
-
-Building the image
-~~~~~~~~~~~~~~~~~~
-
-To build your own image from this repository, run:
-
-.. code-block:: console
-
-   $ docker build -t python-gitlab:latest .
-
-Run your own image:
-
-.. code-block:: console
-
-   $ docker run -it --rm python-gitlab:latest <command> ...
-
-Build a Debian slim-based image:
-
-.. code-block:: console
-
-   $ docker build -t python-gitlab:latest --build-arg PYTHON_FLAVOR=slim-bullseye .
-
-Bug reports
------------
-
-Please report bugs and feature requests at
-https://github.com/python-gitlab/python-gitlab/issues.
-
-Gitter Community Chat
----------------------
-
-We have a `gitter <https://gitter.im/python-gitlab/Lobby>`_ community chat
-available at https://gitter.im/python-gitlab/Lobby, which you can also
-directly access via the Open Chat button below.
-
-If you have a simple question, the community might be able to help already,
-without you opening an issue. If you regularly use python-gitlab, we also
-encourage you to join and participate. You might discover new ideas and
-use cases yourself!
-
-Documentation
--------------
-
-The full documentation for CLI and API is available on `readthedocs
-<http://python-gitlab.readthedocs.org/en/stable/>`_.
-
-Build the docs
-~~~~~~~~~~~~~~
-
-We use ``tox`` to manage our environment and build the documentation::
-
-    pip install tox
-    tox -e docs
-
-Contributing
-------------
-
-For guidelines for contributing to ``python-gitlab``, refer to `CONTRIBUTING.rst <https://github.com/python-gitlab/python-gitlab/blob/main/CONTRIBUTING.rst>`_.
+"""
+GitLab API:
+https://docs.gitlab.com/ee/api/users.html
+https://docs.gitlab.com/ee/api/projects.html#list-projects-starred-by-a-user
+"""
+
+from __future__ import annotations
+
+from typing import Any, cast, Literal, Optional, overload
+
+import requests
+
+from gitlab import cli
+from gitlab import exceptions as exc
+from gitlab import types
+from gitlab.base import RESTObject, RESTObjectList
+from gitlab.mixins import (
+    CreateMixin,
+    CRUDMixin,
+    DeleteMixin,
+    GetWithoutIdMixin,
+    ListMixin,
+    NoUpdateMixin,
+    ObjectDeleteMixin,
+    RetrieveMixin,
+    SaveMixin,
+    UpdateMixin,
+)
+from gitlab.types import ArrayAttribute, RequiredOptional
+
+from .custom_attributes import UserCustomAttributeManager  # noqa: F401
+from .events import UserEventManager  # noqa: F401
+from .personal_access_tokens import UserPersonalAccessTokenManager  # noqa: F401
+
+__all__ = [
+    "CurrentUserEmail",
+    "CurrentUserEmailManager",
+    "CurrentUserGPGKey",
+    "CurrentUserGPGKeyManager",
+    "CurrentUserKey",
+    "CurrentUserKeyManager",
+    "CurrentUserRunner",
+    "CurrentUserRunnerManager",
+    "CurrentUserStatus",
+    "CurrentUserStatusManager",
+    "CurrentUser",
+    "CurrentUserManager",
+    "User",
+    "UserManager",
+    "ProjectUser",
+    "ProjectUserManager",
+    "StarredProject",
+    "StarredProjectManager",
+    "UserEmail",
+    "UserEmailManager",
+    "UserActivities",
+    "UserStatus",
+    "UserStatusManager",
+    "UserActivitiesManager",
+    "UserGPGKey",
+    "UserGPGKeyManager",
+    "UserKey",
+    "UserKeyManager",
+    "UserIdentityProviderManager",
+    "UserImpersonationToken",
+    "UserImpersonationTokenManager",
+    "UserMembership",
+    "UserMembershipManager",
+    "UserProject",
+    "UserProjectManager",
+    "UserContributedProject",
+    "UserContributedProjectManager",
+]
+
+
+class CurrentUserEmail(ObjectDeleteMixin, RESTObject):
+    _repr_attr = "email"
+
+
+class CurrentUserEmailManager(
+    RetrieveMixin[CurrentUserEmail],
+    CreateMixin[CurrentUserEmail],
+    DeleteMixin[CurrentUserEmail],
+):
+    _path = "/user/emails"
+    _obj_cls = CurrentUserEmail
+    _create_attrs = RequiredOptional(required=("email",))
+
+
+class CurrentUserGPGKey(ObjectDeleteMixin, RESTObject):
+    pass
+
+
+class CurrentUserGPGKeyManager(
+    RetrieveMixin[CurrentUserGPGKey],
+    CreateMixin[CurrentUserGPGKey],
+    DeleteMixin[CurrentUserGPGKey],
+):
+    _path = "/user/gpg_keys"
+    _obj_cls = CurrentUserGPGKey
+    _create_attrs = RequiredOptional(required=("key",))
+
+
+class CurrentUserKey(ObjectDeleteMixin, RESTObject):
+    _repr_attr = "title"
+
+
+class CurrentUserKeyManager(
+    RetrieveMixin[CurrentUserKey],
+    CreateMixin[CurrentUserKey],
+    DeleteMixin[CurrentUserKey],
+):
+    _path = "/user/keys"
+    _obj_cls = CurrentUserKey
+    _create_attrs = RequiredOptional(required=("title", "key"))
+
+
+class CurrentUserRunner(RESTObject):
+    pass
+
+
+class CurrentUserRunnerManager(CreateMixin[CurrentUserRunner]):
+    _path = "/user/runners"
+    _obj_cls = CurrentUserRunner
+    _types = {"tag_list": types.CommaSeparatedListAttribute}
+    _create_attrs = RequiredOptional(
+        required=("runner_type",),
+        optional=(
+            "group_id",
+            "project_id",
+            "description",
+            "paused",
+            "locked",
+            "run_untagged",
+            "tag_list",
+            "access_level",
+            "maximum_timeout",
+            "maintenance_note",
+        ),
+    )
+
+
+class CurrentUserStatus(SaveMixin, RESTObject):
+    _id_attr = None
+    _repr_attr = "message"
+
+
+class CurrentUserStatusManager(
+    GetWithoutIdMixin[CurrentUserStatus], UpdateMixin[CurrentUserStatus]
+):
+    _path = "/user/status"
+    _obj_cls = CurrentUserStatus
+    _update_attrs = RequiredOptional(optional=("emoji", "message"))
+
+
+class CurrentUser(RESTObject):
+    _id_attr = None
+    _repr_attr = "username"
+
+    emails: CurrentUserEmailManager
+    gpgkeys: CurrentUserGPGKeyManager
+    keys: CurrentUserKeyManager
+    runners: CurrentUserRunnerManager
+    status: CurrentUserStatusManager
+
+
+class CurrentUserManager(GetWithoutIdMixin[CurrentUser]):
+    _path = "/user"
+    _obj_cls = CurrentUser
+
+
+class User(SaveMixin, ObjectDeleteMixin, RESTObject):
+    _repr_attr = "username"
+
+    customattributes: UserCustomAttributeManager
+    emails: UserEmailManager
+    events: UserEventManager
+    followers_users: UserFollowersManager
+    following_users: UserFollowingManager
+    gpgkeys: UserGPGKeyManager
+    identityproviders: UserIdentityProviderManager
+    impersonationtokens: UserImpersonationTokenManager
+    keys: UserKeyManager
+    memberships: UserMembershipManager
+    personal_access_tokens: UserPersonalAccessTokenManager
+    projects: UserProjectManager
+    contributed_projects: UserContributedProjectManager
+    starred_projects: StarredProjectManager
+    status: UserStatusManager
+
+    @cli.register_custom_action(cls_names="User")
+    @exc.on_http_error(exc.GitlabBlockError)
+    def block(self, **kwargs: Any) -> bool | None:
+        """Block the user.
+
+        Args:
+            **kwargs: Extra options to send to the server (e.g. sudo)
+
+        Raises:
+            GitlabAuthenticationError: If authentication is not correct
+            GitlabBlockError: If the user could not be blocked
+
+        Returns:
+            Whether the user status has been changed
+        """
+        path = f"/users/{self.encoded_id}/block"
+        # NOTE: Undocumented behavior of the GitLab API is that it returns a
+        # boolean or None
+        server_data = cast(
+            Optional[bool], self.manager.gitlab.http_post(path, **kwargs)
+        )
+        if server_data is True:
+            self._attrs["state"] = "blocked"
+        return server_data
+
+    @cli.register_custom_action(cls_names="User")
+    @exc.on_http_error(exc.GitlabFollowError)
+    def follow(self, **kwargs: Any) -> dict[str, Any] | requests.Response:
+        """Follow the user.
+
+        Args:
+            **kwargs: Extra options to send to the server (e.g. sudo)
+
+        Raises:
+            GitlabAuthenticationError: If authentication is not correct
+            GitlabFollowError: If the user could not be followed
+
+        Returns:
+            The new object data (*not* a RESTObject)
+        """
+        path = f"/users/{self.encoded_id}/follow"
+        return self.manager.gitlab.http_post(path, **kwargs)
+
+    @cli.register_custom_action(cls_names="User")
+    @exc.on_http_error(exc.GitlabUnfollowError)
+    def unfollow(self, **kwargs: Any) -> dict[str, Any] | requests.Response:
+        """Unfollow the user.
+
+        Args:
+            **kwargs: Extra options to send to the server (e.g. sudo)
+
+        Raises:
+            GitlabAuthenticationError: If authentication is not correct
+            GitlabUnfollowError: If the user could not be followed
+
+        Returns:
+            The new object data (*not* a RESTObject)
+        """
+        path = f"/users/{self.encoded_id}/unfollow"
+        return self.manager.gitlab.http_post(path, **kwargs)
+
+    @cli.register_custom_action(cls_names="User")
+    @exc.on_http_error(exc.GitlabUnblockError)
+    def unblock(self, **kwargs: Any) -> bool | None:
+        """Unblock the user.
+
+        Args:
+            **kwargs: Extra options to send to the server (e.g. sudo)
+
+        Raises:
+            GitlabAuthenticationError: If authentication is not correct
+            GitlabUnblockError: If the user could not be unblocked
+
+        Returns:
+            Whether the user status has been changed
+        """
+        path = f"/users/{self.encoded_id}/unblock"
+        # NOTE: Undocumented behavior of the GitLab API is that it returns a
+        # boolean or None
+        server_data = cast(
+            Optional[bool], self.manager.gitlab.http_post(path, **kwargs)
+        )
+        if server_data is True:
+            self._attrs["state"] = "active"
+        return server_data
+
+    @cli.register_custom_action(cls_names="User")
+    @exc.on_http_error(exc.GitlabDeactivateError)
+    def deactivate(self, **kwargs: Any) -> dict[str, Any] | requests.Response:
+        """Deactivate the user.
+
+        Args:
+            **kwargs: Extra options to send to the server (e.g. sudo)
+
+        Raises:
+            GitlabAuthenticationError: If authentication is not correct
+            GitlabDeactivateError: If the user could not be deactivated
+
+        Returns:
+            Whether the user status has been changed
+        """
+        path = f"/users/{self.encoded_id}/deactivate"
+        server_data = self.manager.gitlab.http_post(path, **kwargs)
+        if server_data:
+            self._attrs["state"] = "deactivated"
+        return server_data
+
+    @cli.register_custom_action(cls_names="User")
+    @exc.on_http_error(exc.GitlabActivateError)
+    def activate(self, **kwargs: Any) -> dict[str, Any] | requests.Response:
+        """Activate the user.
+
+        Args:
+            **kwargs: Extra options to send to the server (e.g. sudo)
+
+        Raises:
+            GitlabAuthenticationError: If authentication is not correct
+            GitlabActivateError: If the user could not be activated
+
+        Returns:
+            Whether the user status has been changed
+        """
+        path = f"/users/{self.encoded_id}/activate"
+        server_data = self.manager.gitlab.http_post(path, **kwargs)
+        if server_data:
+            self._attrs["state"] = "active"
+        return server_data
+
+    @cli.register_custom_action(cls_names="User")
+    @exc.on_http_error(exc.GitlabUserApproveError)
+    def approve(self, **kwargs: Any) -> dict[str, Any] | requests.Response:
+        """Approve a user creation request.
+
+        Args:
+            **kwargs: Extra options to send to the server (e.g. sudo)
+
+        Raises:
+            GitlabAuthenticationError: If authentication is not correct
+            GitlabUserApproveError: If the user could not be activated
+
+        Returns:
+            The new object data (*not* a RESTObject)
+        """
+        path = f"/users/{self.encoded_id}/approve"
+        return self.manager.gitlab.http_post(path, **kwargs)
+
+    @cli.register_custom_action(cls_names="User")
+    @exc.on_http_error(exc.GitlabUserRejectError)
+    def reject(self, **kwargs: Any) -> dict[str, Any] | requests.Response:
+        """Reject a user creation request.
+
+        Args:
+            **kwargs: Extra options to send to the server (e.g. sudo)
+
+        Raises:
+            GitlabAuthenticationError: If authentication is not correct
+            GitlabUserRejectError: If the user could not be rejected
+
+        Returns:
+            The new object data (*not* a RESTObject)
+        """
+        path = f"/users/{self.encoded_id}/reject"
+        return self.manager.gitlab.http_post(path, **kwargs)
+
+    @cli.register_custom_action(cls_names="User")
+    @exc.on_http_error(exc.GitlabBanError)
+    def ban(self, **kwargs: Any) -> dict[str, Any] | requests.Response:
+        """Ban the user.
+
+        Args:
+            **kwargs: Extra options to send to the server (e.g. sudo)
+
+        Raises:
+            GitlabAuthenticationError: If authentication is not correct
+            GitlabBanError: If the user could not be banned
+
+        Returns:
+            Whether the user has been banned
+        """
+        path = f"/users/{self.encoded_id}/ban"
+        server_data = self.manager.gitlab.http_post(path, **kwargs)
+        if server_data:
+            self._attrs["state"] = "banned"
+        return server_data
+
+    @cli.register_custom_action(cls_names="User")
+    @exc.on_http_error(exc.GitlabUnbanError)
+    def unban(self, **kwargs: Any) -> dict[str, Any] | requests.Response:
+        """Unban the user.
+
+        Args:
+            **kwargs: Extra options to send to the server (e.g. sudo)
+
+        Raises:
+            GitlabAuthenticationError: If authentication is not correct
+            GitlabUnbanError: If the user could not be unbanned
+
+        Returns:
+            Whether the user has been unbanned
+        """
+        path = f"/users/{self.encoded_id}/unban"
+        server_data = self.manager.gitlab.http_post(path, **kwargs)
+        if server_data:
+            self._attrs["state"] = "active"
+        return server_data
+
+
+class UserManager(CRUDMixin[User]):
+    _path = "/users"
+    _obj_cls = User
+
+    _list_filters = (
+        "active",
+        "blocked",
+        "username",
+        "extern_uid",
+        "provider",
+        "external",
+        "search",
+        "custom_attributes",
+        "status",
+        "two_factor",
+        "admins",
+    )
+    _create_attrs = RequiredOptional(
+        optional=(
+            "email",
+            "username",
+            "name",
+            "password",
+            "reset_password",
+            "skype",
+            "linkedin",
+            "twitter",
+            "projects_limit",
+            "extern_uid",
+            "provider",
+            "bio",
+            "admin",
+            "can_create_group",
+            "website_url",
+            "skip_confirmation",
+            "external",
+            "organization",
+            "location",
+            "avatar",
+            "public_email",
+            "private_profile",
+            "color_scheme_id",
+            "theme_id",
+        )
+    )
+    _update_attrs = RequiredOptional(
+        required=("email", "username", "name"),
+        optional=(
+            "password",
+            "skype",
+            "linkedin",
+            "twitter",
+            "projects_limit",
+            "extern_uid",
+            "provider",
+            "bio",
+            "admin",
+            "can_create_group",
+            "website_url",
+            "skip_reconfirmation",
+            "external",
+            "organization",
+            "location",
+            "avatar",
+            "public_email",
+            "private_profile",
+            "color_scheme_id",
+            "theme_id",
+        ),
+    )
+    _types = {"confirm": types.LowercaseStringAttribute, "avatar": types.ImageAttribute}
+
+
+class ProjectUser(RESTObject):
+    pass
+
+
+class ProjectUserManager(ListMixin[ProjectUser]):
+    _path = "/projects/{project_id}/users"
+    _obj_cls = ProjectUser
+    _from_parent_attrs = {"project_id": "id"}
+    _list_filters = ("search", "skip_users")
+    _types = {"skip_users": types.ArrayAttribute}
+
+
+class UserEmail(ObjectDeleteMixin, RESTObject):
+    _repr_attr = "email"
+
+
+class UserEmailManager(
+    RetrieveMixin[UserEmail], CreateMixin[UserEmail], DeleteMixin[UserEmail]
+):
+    _path = "/users/{user_id}/emails"
+    _obj_cls = UserEmail
+    _from_parent_attrs = {"user_id": "id"}
+    _create_attrs = RequiredOptional(required=("email",))
+
+
+class UserActivities(RESTObject):
+    _id_attr = "username"
+
+
+class UserStatus(RESTObject):
+    _id_attr = None
+    _repr_attr = "message"
+
+
+class UserStatusManager(GetWithoutIdMixin[UserStatus]):
+    _path = "/users/{user_id}/status"
+    _obj_cls = UserStatus
+    _from_parent_attrs = {"user_id": "id"}
+
+
+class UserActivitiesManager(ListMixin[UserActivities]):
+    _path = "/user/activities"
+    _obj_cls = UserActivities
+
+
+class UserGPGKey(ObjectDeleteMixin, RESTObject):
+    pass
+
+
+class UserGPGKeyManager(
+    RetrieveMixin[UserGPGKey], CreateMixin[UserGPGKey], DeleteMixin[UserGPGKey]
+):
+    _path = "/users/{user_id}/gpg_keys"
+    _obj_cls = UserGPGKey
+    _from_parent_attrs = {"user_id": "id"}
+    _create_attrs = RequiredOptional(required=("key",))
+
+
+class UserKey(ObjectDeleteMixin, RESTObject):
+    pass
+
+
+class UserKeyManager(
+    RetrieveMixin[UserKey], CreateMixin[UserKey], DeleteMixin[UserKey]
+):
+    _path = "/users/{user_id}/keys"
+    _obj_cls = UserKey
+    _from_parent_attrs = {"user_id": "id"}
+    _create_attrs = RequiredOptional(required=("title", "key"))
+
+
+class UserIdentityProviderManager(DeleteMixin[User]):
+    """Manager for user identities.
+
+    This manager does not actually manage objects but enables
+    functionality for deletion of user identities by provider.
+    """
+
+    _path = "/users/{user_id}/identities"
+    _obj_cls = User
+    _from_parent_attrs = {"user_id": "id"}
+
+
+class UserImpersonationToken(ObjectDeleteMixin, RESTObject):
+    pass
+
+
+class UserImpersonationTokenManager(NoUpdateMixin[UserImpersonationToken]):
+    _path = "/users/{user_id}/impersonation_tokens"
+    _obj_cls = UserImpersonationToken
+    _from_parent_attrs = {"user_id": "id"}
+    _create_attrs = RequiredOptional(
+        required=("name", "scopes"), optional=("expires_at",)
+    )
+    _list_filters = ("state",)
+    _types = {"scopes": ArrayAttribute}
+
+
+class UserMembership(RESTObject):
+    _id_attr = "source_id"
+
+
+class UserMembershipManager(RetrieveMixin[UserMembership]):
+    _path = "/users/{user_id}/memberships"
+    _obj_cls = UserMembership
+    _from_parent_attrs = {"user_id": "id"}
+    _list_filters = ("type",)
+
+
+# Having this outside projects avoids circular imports due to ProjectUser
+class UserProject(RESTObject):
+    pass
+
+
+class UserProjectManager(ListMixin[UserProject], CreateMixin[UserProject]):
+    _path = "/projects/user/{user_id}"
+    _obj_cls = UserProject
+    _from_parent_attrs = {"user_id": "id"}
+    _create_attrs = RequiredOptional(
+        required=("name",),
+        optional=(
+            "default_branch",
+            "issues_enabled",
+            "wall_enabled",
+            "merge_requests_enabled",
+            "wiki_enabled",
+            "snippets_enabled",
+            "squash_option",
+            "public",
+            "visibility",
+            "description",
+            "builds_enabled",
+            "public_builds",
+            "import_url",
+            "only_allow_merge_if_build_succeeds",
+        ),
+    )
+    _list_filters = (
+        "archived",
+        "visibility",
+        "order_by",
+        "sort",
+        "search",
+        "simple",
+        "owned",
+        "membership",
+        "starred",
+        "statistics",
+        "with_issues_enabled",
+        "with_merge_requests_enabled",
+        "with_custom_attributes",
+        "with_programming_language",
+        "wiki_checksum_failed",
+        "repository_checksum_failed",
+        "min_access_level",
+        "id_after",
+        "id_before",
+    )
+
+    @overload
+    def list(
+        self, *, iterator: Literal[False] = False, **kwargs: Any
+    ) -> list[UserProject]: ...
+
+    @overload
+    def list(
+        self, *, iterator: Literal[True] = True, **kwargs: Any
+    ) -> RESTObjectList[UserProject]: ...
+
+    @overload
+    def list(
+        self, *, iterator: bool = False, **kwargs: Any
+    ) -> RESTObjectList[UserProject] | list[UserProject]: ...
+
+    def list(
+        self, *, iterator: bool = False, **kwargs: Any
+    ) -> RESTObjectList[UserProject] | list[UserProject]:
+        """Retrieve a list of objects.
+
+        Args:
+            get_all: If True, return all the items, without pagination
+            per_page: Number of items to retrieve per request
+            page: ID of the page to return (starts with page 1)
+            iterator: If set to True and no pagination option is
+                defined, return a generator instead of a list
+            **kwargs: Extra options to send to the server (e.g. sudo)
+
+        Returns:
+            The list of objects, or a generator if `iterator` is True
+
+        Raises:
+            GitlabAuthenticationError: If authentication is not correct
+            GitlabListError: If the server cannot perform the request
+        """
+        if self._parent:
+            path = f"/users/{self._parent.id}/projects"
+        else:
+            path = f"/users/{self._from_parent_attrs['user_id']}/projects"
+        return super().list(path=path, iterator=iterator, **kwargs)
+
+
+class UserContributedProject(RESTObject):
+    _id_attr = "id"
+    _repr_attr = "path_with_namespace"
+
+
+class UserContributedProjectManager(ListMixin[UserContributedProject]):
+    _path = "/users/{user_id}/contributed_projects"
+    _obj_cls = UserContributedProject
+    _from_parent_attrs = {"user_id": "id"}
+
+
+class StarredProject(RESTObject):
+    pass
+
+
+class StarredProjectManager(ListMixin[StarredProject]):
+    _path = "/users/{user_id}/starred_projects"
+    _obj_cls = StarredProject
+    _from_parent_attrs = {"user_id": "id"}
+    _list_filters = (
+        "archived",
+        "membership",
+        "min_access_level",
+        "order_by",
+        "owned",
+        "search",
+        "simple",
+        "sort",
+        "starred",
+        "statistics",
+        "visibility",
+        "with_custom_attributes",
+        "with_issues_enabled",
+        "with_merge_requests_enabled",
+    )
+
+
+class UserFollowersManager(ListMixin[User]):
+    _path = "/users/{user_id}/followers"
+    _obj_cls = User
+    _from_parent_attrs = {"user_id": "id"}
+
+
+class UserFollowingManager(ListMixin[User]):
+    _path = "/users/{user_id}/following"
+    _obj_cls = User
+    _from_parent_attrs = {"user_id": "id"}
